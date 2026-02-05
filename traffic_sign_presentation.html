@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yol Nişanlarının Tanınması Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1E2761;
+            --secondary: #CADCFC;
+            --accent: #F96167;
+            --text: #2C3E50;
+            --light: #F5F5F5;
+            --dark: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .presentation {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .slide {
+            min-height: 100vh;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Title Slide */
+        .slide-title {
+            background: linear-gradient(135deg, var(--primary) 0%, #2C5F7E 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-title::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(202, 220, 252, 0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .slide-title h1 {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .slide-title .subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        .slide-title .meta {
+            position: relative;
+            z-index: 1;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            opacity: 0.8;
+        }
+
+        /* Content Slides */
+        .slide-content {
+            background: var(--light);
+        }
+
+        .slide-dark {
+            background: var(--primary);
+            color: white;
+        }
+
+        .slide h2 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-left: 6px solid var(--accent);
+            padding-left: 1.5rem;
+        }
+
+        .slide-dark h2 {
+            color: white;
+        }
+
+        .slide h3 {
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .slide-dark h3 {
+            color: var(--secondary);
+        }
+
+        /* Two Column Layout - Responsive */
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .column {
+            padding: 1rem;
+        }
+
+        /* Feature Grid - Responsive */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 1.8rem;
+            border-radius: 12px;
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(249, 97, 103, 0.05) 0%, transparent 70%);
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scale(1.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 35px rgba(249, 97, 103, 0.2);
+            border-left-width: 6px;
+        }
+
+        .feature-card:nth-child(odd) {
+            border-left-color: var(--primary);
+        }
+
+        .feature-card:nth-child(odd):hover {
+            box-shadow: 0 10px 35px rgba(30, 39, 97, 0.2);
+        }
+
+        .feature-card h4 {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card p {
+            line-height: 1.7;
+            color: var(--text);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Accordion Styles */
+        .accordion {
+            margin: 2rem 0;
+        }
+
+        .accordion-item {
+            background: white;
+            margin-bottom: 1.2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-item:hover {
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .accordion-item:nth-child(1) {
+            border-color: rgba(30, 39, 97, 0.2);
+        }
+
+        .accordion-item:nth-child(2) {
+            border-color: rgba(249, 97, 103, 0.2);
+        }
+
+        .accordion-item:nth-child(3) {
+            border-color: rgba(202, 220, 252, 0.3);
+        }
+
+        .accordion-item:nth-child(4) {
+            border-color: rgba(44, 95, 126, 0.2);
+        }
+
+        /* Different colors for each accordion */
+        .accordion-item:nth-child(1) .accordion-header {
+            background: linear-gradient(135deg, #1E2761 0%, #2C3E70 100%);
+        }
+
+        .accordion-item:nth-child(2) .accordion-header {
+            background: linear-gradient(135deg, #F96167 0%, #FF7B7F 100%);
+        }
+
+        .accordion-item:nth-child(3) .accordion-header {
+            background: linear-gradient(135deg, #2C5F7E 0%, #3A7CA5 100%);
+        }
+
+        .accordion-item:nth-child(4) .accordion-header {
+            background: linear-gradient(135deg, #5B4B8A 0%, #7B68A6 100%);
+        }
+
+        .accordion-header {
+            color: white;
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .accordion-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        .accordion-header:hover::before {
+            left: 100%;
+        }
+
+        .accordion-header .icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .accordion-header.active .icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            padding: 0 1.5rem;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .accordion-content.active {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        .accordion-content p, .accordion-content ul {
+            line-height: 1.8;
+            color: var(--text);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .accordion-content ul {
+            padding-left: 1.5rem;
+        }
+
+        .accordion-content li {
+            margin: 0.5rem 0;
+            position: relative;
+            padding-left: 0.5rem;
+        }
+
+        .accordion-content li::before {
+            content: '▸';
+            position: absolute;
+            left: -1rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Code Block - Responsive */
+        .code-container {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            border: 2px solid rgba(249, 97, 103, 0.3);
+            position: relative;
+        }
+
+        .code-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--accent) 100%);
+        }
+
+        .code-header {
+            color: #CADCFC;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+            line-height: 1.5;
+            color: #e0e0e0;
+            white-space: pre;
+            word-wrap: break-word;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* List Styles */
+        ul, ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.8rem 0;
+            line-height: 1.7;
+            font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+        }
+
+        .slide-dark li {
+            color: var(--secondary);
+        }
+
+        /* Stats Display - Responsive */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(249, 97, 103, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(249, 97, 103, 0.3);
+        }
+
+        .stat-number {
+            font-size: clamp(2.5rem, 7vw, 4rem);
+            font-weight: 800;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 10px rgba(249, 97, 103, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            opacity: 0.95;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Architecture Diagram */
+        .architecture-box {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 3px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: var(--primary);
+            transition: all 0.4s ease;
+            box-shadow: 0 3px 12px rgba(30, 39, 97, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .architecture-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--primary);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .architecture-box:hover::before {
+            width: 120%;
+            height: 120%;
+        }
+
+        .architecture-box:hover {
+            color: white;
+            border-color: var(--accent);
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(30, 39, 97, 0.2);
+        }
+
+        .architecture-box span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: clamp(1.8rem, 3vw, 2.2rem);
+            margin: 0.5rem 0;
+            color: var(--accent);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(5px);
+            }
+        }
+
+        /* File Structure */
+        .file-tree {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            color: #e0e0e0;
+            line-height: 1.8;
+            font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .folder {
+            color: #F96167;
+            font-weight: 600;
+        }
+
+        .file {
+            color: #CADCFC;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.8rem;
+            z-index: 1000;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #2C3E70 100%);
+            color: white;
+            border: none;
+            padding: 1rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 2vw, 1.05rem);
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(30, 39, 97, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--accent);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .nav-btn:hover:not(:disabled)::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(249, 97, 103, 0.4);
+        }
+
+        .nav-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #666 0%, #888 100%);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            background: linear-gradient(135deg, rgba(30, 39, 97, 0.95) 0%, rgba(44, 62, 112, 0.95) 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 2vw, 1.05rem);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(30, 39, 97, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Process Steps - Responsive */
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .step:hover::before {
+            transform: scaleY(1);
+        }
+
+        .step:hover {
+            border-color: var(--accent);
+            box-shadow: 0 6px 25px rgba(249, 97, 103, 0.15);
+            transform: translateX(5px);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--accent) 0%, #FF7B7F 100%);
+            color: white;
+            min-width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(249, 97, 103, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover .step-number {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(249, 97, 103, 0.4);
+        }
+
+        .step-content h4 {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: var(--text);
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem 1rem;
+                min-height: auto;
+            }
+
+            .slide h2 {
+                padding-left: 1rem;
+                border-left-width: 4px;
+            }
+
+            .navigation {
+                bottom: 1rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+
+            .slide-counter {
+                bottom: 1rem;
+                left: 1rem;
+            }
+
+            .architecture-box {
+                padding: 0.8rem;
+            }
+
+            .file-tree {
+                padding: 1rem;
+                font-size: 0.75rem;
+            }
+
+            .accordion-header {
+                padding: 1rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slide {
+                padding: 1.5rem 0.8rem;
+            }
+
+            .nav-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .slide-counter {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .step-number {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Başlıq -->
+        <section class="slide slide-title active" data-slide="1">
+            <h1>Yol Nişanlarının Tanınması</h1>
+            <p class="subtitle">Konvolyusiya Neyron Şəbəkələri ilə Dərin Öyrənmə Yanaşması</p>
+            <div class="meta">
+                <p>Kompüter Görmə | Maşın Öyrənməsi | CNN Arxitekturası</p>
+            </div>
+        </section>
+
+        <!-- Slide 2: Ümumi Baxış -->
+        <section class="slide slide-content" data-slide="2">
+            <h2>Layihəyə Ümumi Baxış</h2>
+            <div class="two-column">
+                <div class="column">
+                    <h3>Məqsəd</h3>
+                    <p style="font-size: clamp(0.95rem, 2.2vw, 1.1rem); line-height: 1.8; color: var(--text); margin-bottom: 2rem;">
+                        Dərin öyrənmə texnikalarından istifadə edərək yol nişanlarını avtomatik olaraq tanıyan və təsnif edən sistem yaratmaq. 
+                        Sistem real şəraitdə yüksək dəqiqlik əldə etmək üçün Konvolyusiya Neyron Şəbəkələrindən istifadə edir.
+                    </p>
+                    <h3>Əsas Tətbiq Sahələri</h3>
+                    <ul>
+                        <li>Avtonom nəqliyyat vasitələrinin naviqasiyası</li>
+                        <li>Sürücü köməkçi sistemləri</li>
+                        <li>Trafik monitorinqi və analitikası</li>
+                        <li>Yol təhlükəsizliyinin artırılması</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>43 Sinif</h4>
+                            <p>Alman yol nişanı kateqoriyalarının hərtərəfli əhatəsi</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Real Vaxt</h4>
+                            <p>Ani tanınma üçün veb-kamera inteqrasiyası</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Yüksək Dəqiqlik</h4>
+                            <p>Data artırma ilə 95%-dən yuxarı doğrulama dəqiqliyi</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Genişlənən</h4>
+                            <p>Əlavə nişan növləri üçün uyğunlaşa bilən arxitektura</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Dataset -->
+        <section class="slide slide-dark" data-slide="3">
+            <h2>Dataset Xüsusiyyətləri</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">43</span>
+                    <span class="stat-label">Nişan Kateqoriyası</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">50,000+</span>
+                    <span class="stat-label">Təlim Şəkilləri</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">32x32</span>
+                    <span class="stat-label">Şəkil Ölçüsü</span>
+                </div>
+            </div>
+            <h3 style="margin-top: 3rem;">GTSRB Dataset</h3>
+            <p style="font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 1.8; margin-bottom: 2rem;">
+                Alman Yol Nişanlarının Tanınması Benchmark müxtəlif işıqlandırma, hava şəraiti və 
+                baxış bucaqları altında çəkilmiş real yol nişanı şəkillərini ehtiva edən geniş istifadə olunan datasetdir. 
+                Bu müxtəliflik modelin möhkəm performansını təmin edir.
+            </p>
+            <div class="two-column">
+                <div>
+                    <h3>Data Mənbəyi</h3>
+                    <p style="line-height: 1.7;">Kaggle Dataset: GTSRB-German-Traffic-Sign</p>
+                    <p style="line-height: 1.7; opacity: 0.8; margin-top: 1rem;">
+                        URL: kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign
+                    </p>
+                </div>
+                <div>
+                    <h3>Nişan Kateqoriyalarına Daxildir</h3>
+                    <ul style="font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <li>Sürət məhdudiyyəti nişanları (20-120 km/s)</li>
+                        <li>Xəbərdarlıq nişanları (döngələr, keçidlər)</li>
+                        <li>Məcburi nişanlar (istiqamətlər, dairəvi hərəkət)</li>
+                        <li>Qadağan nişanları (giriş yoxdur, ötmə yoxdur)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Layihə Strukturu -->
+        <section class="slide slide-content" data-slide="4">
+            <h2>Layihə Arxitekturası</h2>
+            <div class="two-column">
+                <div class="column">
+                    <h3>Fayl Sistemi Strukturu</h3>
+                    <div class="file-tree">
+<span class="folder">traffic_sign_recognition/</span>
+│
+├── <span class="folder">data/</span>
+│   ├── <span class="folder">Train/</span>
+│   │   ├── <span class="folder">0/</span>
+│   │   ├── <span class="folder">1/</span>
+│   │   ├── <span class="folder">2/</span>
+│   │   └── ... (43 sinif qovluğu)
+│   │
+│   ├── <span class="folder">Test/</span>
+│   │   ├── Test şəkilləri
+│   │   └── <span class="file">Test.csv</span>
+│   │
+│   └── <span class="folder">Meta/</span>
+│       └── Nişan adları və metadata
+│
+├── <span class="folder">models/</span>
+│   └── <span class="file">traffic_sign_model.h5</span>
+│
+├── <span class="file">train.py</span>
+├── <span class="file">predict.py</span>
+├── <span class="file">labels.csv</span>
+└── <span class="file">requirements.txt</span>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3>Komponent Təsvirləri</h3>
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Data Qovluğu</h4>
+                                <p>Sinif etiketlərinə görə təşkil edilmiş təlim və test datasetlərini ehtiva edir</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Models Qovluğu</h4>
+                                <p>Təlim keçmiş neyron şəbəkə çəkilərini və arxitekturasını saxlayır</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Təlim Skripti</h4>
+                                <p>CNN arxitekturası, data artırma və təlim dövrünü həyata keçirir</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Proqnozlaşdırma Skripti</h4>
+                                <p>Şəkillər və ya veb-kamera üzərində nəticə çıxarmaq üçün təlim keçmiş modeli yükləyir</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Texniki Tələblər -->
+        <section class="slide slide-content" data-slide="5">
+            <h2>Texniki Tələblər</h2>
+            
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Əsas Kitabxanalar və Quraşdırma</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="code-container">
+                            <div class="code-header">Quraşdırma əmri</div>
+                            <pre><code>pip install tensorflow keras numpy pandas matplotlib opencv-python scikit-learn</code></pre>
+                        </div>
+                        <ul>
+                            <li><strong>TensorFlow/Keras:</strong> CNN implementasiyası üçün dərin öyrənmə framework-ü</li>
+                            <li><strong>NumPy:</strong> Ədədi hesablamalar və massiv əməliyyatları</li>
+                            <li><strong>Pandas:</strong> Data manipulyasiyası və CSV emalı</li>
+                            <li><strong>Matplotlib:</strong> Təlim metrikalarının və nəticələrin vizuallaşdırılması</li>
+                            <li><strong>OpenCV:</strong> Şəkil emalı və veb-kamera inteqrasiyası</li>
+                            <li><strong>scikit-learn:</strong> Dataset bölünməsi və preprocessing utilləri</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Virtual Mühitin Qurulması</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Virtual mühit yaradılması tövsiyə olunur:</strong></p>
+                        <p>Virtual mühit asılılıqların izolyasiyası və versiya idarəçiliyi üçün zəruridir. Bu, layihə üçün ayrı bir Python mühiti yaradır və sistem kitabxanaları ilə konfliktlərin qarşısını alır.</p>
+                        <div class="code-container" style="margin-top: 1rem;">
+                            <div class="code-header">Virtual mühit yaratmaq</div>
+                            <pre><code>python -m venv traffic_env
+source traffic_env/bin/activate  # Linux/Mac
+traffic_env\Scripts\activate     # Windows</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: CNN Arxitekturası -->
+        <section class="slide slide-dark" data-slide="6">
+            <h2>Neyron Şəbəkə Arxitekturası</h2>
+            <div class="two-column">
+                <div class="column">
+                    <h3>Layer Konfiqurasiyası</h3>
+                    <div class="architecture-box"><span>Input Layer (32×32×3 RGB)</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Conv2D (32 filter, 5×5) + ReLU</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Conv2D (32 filter, 5×5) + ReLU</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>MaxPooling (2×2) + Dropout (25%)</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Conv2D (64 filter, 3×3) + ReLU</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Conv2D (64 filter, 3×3) + ReLU</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>MaxPooling (2×2) + Dropout (25%)</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Flatten Layer</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Dense (256 vahid) + ReLU + Dropout (50%)</span></div>
+                    <div class="arrow">↓</div>
+                    <div class="architecture-box"><span>Output (43 vahid) + Softmax</span></div>
+                </div>
+                <div class="column">
+                    <h3>Arxitektura Xüsusiyyətləri</h3>
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Convolutional Layer-lər</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Yol nişanı şəkillərindən məkan xüsusiyyətlərini və nümunələrini çıxarmaq üçün çoxsaylı filter banklarından istifadə edir. Conv2D layer-ləri şəkildən ən əhəmiyyətli xüsusiyyətləri avtomatik olaraq öyrənir və aşkar edir.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Pooling Əməliyyatları</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Məkan ölçülərini azaldaraq vacib xüsusiyyətləri saxlayır və hesablama səmərəliliyini artırır. MaxPooling ən güclü xüsusiyyətləri seçir və modelin ölçüsünü azaldır.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Dropout Requlyarizasiyası</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Təlim zamanı neyronları təsadüfi şəkildə deaktiv edərək overfitting-in qarşısını alır (25%, 50% dərəcələri). Bu, modelin ümumi qabiliyyətini artırır və yeni datalara daha yaxşı adaptasiya olunmasını təmin edir.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Dense Təsnifatlandırma</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Yüksək səviyyəli xüsusiyyət öyrənməsi üçün 256 vahidli tam bağlı layer və 43 sinifli softmax çıxışı. Dense layer bütün öyrənilmiş xüsusiyyətləri birləşdirərək son qərarı verir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Təlim Prosesi -->
+        <section class="slide slide-content" data-slide="7">
+            <h2>Təlim İmplementasiyası</h2>
+            <div class="code-container">
+                <div class="code-header">train.py - Əsas Təlim Dövrü</div>
+                <pre><code># Model Konfiqurasiyası
+model.compile(
+    loss='categorical_crossentropy',
+    optimizer='adam',
+    metrics=['accuracy']
+)
+
+# Data Artırma
+datagen = ImageDataGenerator(
+    rotation_range=10,
+    zoom_range=0.15,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    shear_range=0.15,
+    horizontal_flip=False
+)
+
+# Təlim İcrası
+history = model.fit(
+    datagen.flow(X_train, y_train, batch_size=64),
+    steps_per_epoch=len(X_train) // 64,
+    epochs=15,
+    validation_data=(X_val, y_val)
+)</code></pre>
+            </div>
+            
+            <div class="accordion" style="margin-top: 2rem;">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Təlim Strategiyası</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>Batch Size:</strong> Hər iterasiyada 64 nümunə</li>
+                            <li><strong>Epochs:</strong> 15-25 təlim dövrü</li>
+                            <li><strong>Optimizer:</strong> Adaptiv öyrənmə sürəti ilə Adam</li>
+                            <li><strong>Loss Function:</strong> Kateqorial çarpaz entropiya</li>
+                            <li><strong>Validation Split:</strong> Təlim datasının 20%-i</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>İzah:</strong> Bu parametrlər modelin effektiv öyrənməsini təmin edir. Batch size yaddaş istifadəsini və təlim sürətini balanslaşdırır, epochs isə modelin kifayət qədər öyrənmə vaxtı keçirməsini təmin edir.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Data Artırma Faydaları</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>Rotation:</strong> Əyilmiş nişanları idarə edir</li>
+                            <li><strong>Zoom:</strong> Müxtəlif məsafələri simulyasiya edir</li>
+                            <li><strong>Shifts:</strong> Mərkəzdən kənar yerləşməni nəzərə alır</li>
+                            <li><strong>Shear:</strong> Baxış bucağı dəyişkənliyinə uyğunlaşır</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>Ümumiləşdirmə:</strong> Data artırma görünməmiş datalara ümumi qabiliyyəti artırır. Bu, real dünya şəraitində daha yaxşı performans deməkdir.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Data Preprocessing -->
+        <section class="slide slide-content" data-slide="8">
+            <h2>Data Yükləmə və Preprocessing</h2>
+            <div class="code-container">
+                <div class="code-header">Şəkil Yükləmə və Normallaşdırma</div>
+                <pre><code>data = []
+labels = []
+
+for i in range(NUM_CLASSES):
+    path = os.path.join(TRAIN_DIR, str(i))
+    images = os.listdir(path)
+    
+    for img_name in images:
+        img_path = os.path.join(path, img_name)
+        image = cv2.imread(img_path)
+        image = cv2.resize(image, (32, 32))
+        data.append(image)
+        labels.append(i)
+
+# Piksel dəyərlərini [0, 1] aralığına normallaşdır
+data = np.array(data) / 255.0
+
+# 43 sinif üçün label-ləri one-hot kodla
+labels = to_categorical(labels, 43)</code></pre>
+            </div>
+            <div class="process-steps" style="margin-top: 2rem;">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Şəkil Yükləmə</h4>
+                        <p>OpenCV istifadə edərək sinif üzrə təşkil edilmiş qovluqlardan şəkilləri oxuyur</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Ölçü Dəyişdirmə</h4>
+                        <p>Vahid input ölçüləri üçün bütün şəkilləri 32×32 pikselə standartlaşdırır</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Normallaşdırma</h4>
+                        <p>Təlimin sabitliyi üçün piksel dəyərlərini [0, 255]-dən [0, 1]-ə miqyaslayır</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Label Kodlaması</h4>
+                        <p>Çox sinifli təsnifat üçün sinif indekslərini one-hot kodlanmış vektorlara çevirir</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Proqnozlaşdırma Sistemi -->
+        <section class="slide slide-dark" data-slide="9">
+            <h2>İnference və Deployment</h2>
+            <div class="code-container">
+                <div class="code-header">predict.py - Real Vaxt Tanıma</div>
+                <pre><code>model = load_model("models/traffic_sign_model.h5")
+labels_df = pd.read_csv("labels.csv", header=None)
+class_names = labels_df[0].str.split(" ", n=1, expand=True)[1].tolist()
+
+def predict_sign(image_path=None, use_webcam=False):
+    if use_webcam:
+        cap = cv2.VideoCapture(0)
+        while True:
+            ret, frame = cap.read()
+            img = cv2.resize(frame, (32, 32))
+            img = np.expand_dims(img / 255.0, axis=0)
+            
+            pred = model.predict(img)
+            class_id = np.argmax(pred)
+            confidence = pred[0][class_id] * 100
+            
+            text = f"{class_names[class_id]} ({confidence:.1f}%)"
+            cv2.putText(frame, text, (20, 50), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            cv2.imshow("Traffic Sign Recognition", frame)</code></pre>
+            </div>
+            
+            <div class="accordion" style="margin-top: 2rem;">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Tək Şəkil Proqnozu</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Test şəklini yükləyir və preprocessing edir</li>
+                            <li>Təlim keçmiş model vasitəsilə forward pass edir</li>
+                            <li>Ən yüksək ehtimal sinfini çıxarır</li>
+                            <li>Proqnozu əminlik dərəcəsi ilə göstərir</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>İstifadə:</strong> Ayrı-ayrı şəkilləri test etmək və modelin dəqiqliyini yoxlamaq üçün</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Webcam İnteqrasiyası</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Real vaxt video çəkimi</li>
+                            <li>Kadr-kadr emalı</li>
+                            <li>Canlı proqnoz overlay-i</li>
+                            <li>İnteraktiv nümayiş qabiliyyəti</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>Demo:</strong> Sistemin real şəraitdə necə işlədiyini göstərmək üçün mükəmməldir. Hər saniyədə 30+ kadr emalı mümkündür.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Sinif Etiketləri -->
+        <section class="slide slide-content" data-slide="10">
+            <h2>Yol Nişanı Təsnifat Sistemi</h2>
+            <h3>43 Nişan Kateqoriyası</h3>
+            <div class="two-column">
+                <div class="column">
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Sürət Məhdudiyyətləri və Qadağalar (0-16)</h4>
+                    <ul style="font-size: clamp(0.85rem, 2vw, 0.95rem); line-height: 1.6;">
+                        <li>Sürət məhdudiyyəti (20, 30, 50, 60, 70, 80 km/s)</li>
+                        <li>Sürət məhdudiyyətinin sonu (80 km/s)</li>
+                        <li>Sürət məhdudiyyəti (100, 120 km/s)</li>
+                        <li>Ötmə qadağandır</li>
+                        <li>3.5 metrik tondan ağır nəqliyyat vasitələri üçün ötmə qadağandır</li>
+                        <li>Kəsişmədə üstünlük hüququ</li>
+                        <li>Əsas yol</li>
+                        <li>Yol ver, Dayanma</li>
+                        <li>Nəqliyyat vasitələri qadağandır</li>
+                        <li>3.5 metrik tondan ağır nəqliyyat vasitələri qadağandır</li>
+                        <li>Giriş yoxdur</li>
+                    </ul>
+                    <h4 style="color: var(--accent); margin: 1.5rem 0 1rem;">Xəbərdarlıqlar (17-30)</h4>
+                    <ul style="font-size: clamp(0.85rem, 2vw, 0.95rem); line-height: 1.6;">
+                        <li>Ümumi ehtiyat</li>
+                        <li>Təhlükəli döngə (sol, sağ)</li>
+                        <li>İkiqat döngə</li>
+                        <li>Nahamar yol, Sürüşkən yol</li>
+                        <li>Yol sağdan daralır</li>
+                        <li>Yol işləri, Svetofor</li>
+                        <li>Piyadalar, Uşaq keçidi</li>
+                        <li>Velosiped keçidi</li>
+                        <li>Buz/qar ehtiyatı</li>
+                        <li>Vəhşi heyvanlar keçidi</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Məcburi və İstiqamət (31-42)</h4>
+                    <ul style="font-size: clamp(0.85rem, 2vw, 0.95rem); line-height: 1.6;">
+                        <li>Bütün sürət və ötmə məhdudiyyətlərinin sonu</li>
+                        <li>Sağa dönün</li>
+                        <li>Sola dönün</li>
+                        <li>Yalnız düz</li>
+                        <li>Düz və ya sağa</li>
+                        <li>Düz və ya sola</li>
+                        <li>Sağda saxla, Solda saxla</li>
+                        <li>Dairəvi hərəkət məcburidir</li>
+                        <li>Ötmə qadağasının sonu</li>
+                        <li>3.5 metrik tondan ağır nəqliyyat vasitələri üçün ötmə qadağasının sonu</li>
+                    </ul>
+                    <div class="accordion" style="margin-top: 2rem;">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Label İdarəçiliyi</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <p>Bütün 43 sinif <code>labels.csv</code> faylında saxlanılır və proqnoz və vizuallaşdırma zamanı effektiv axtarış üçün indeks-ad əlaqələndirməsi mövcuddur.</p>
+                                <p style="margin-top: 0.5rem;">Hər sinif unikal nömrə (0-42) ilə identifikasiya olunur və ona uyğun Azərbaycan dilində təsvir verilir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: İmplementasiya Addımları -->
+        <section class="slide slide-dark" data-slide="11">
+            <h2>İmplementasiya İş Axını</h2>
+            <div class="process-steps">
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Dataset Əldə Edilməsi</h4>
+                        <p style="color: var(--secondary);">GTSRB datasetini Kaggle-dan yükləyin və data/Train və data/Test qovluqlarına çıxarın</p>
+                    </div>
+                </div>
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Mühitin Qurulması</h4>
+                        <p style="color: var(--secondary);">Virtual mühit yaradın və tələb olunan paketləri quraşdırın: TensorFlow, Keras, OpenCV, NumPy, Pandas, Matplotlib, scikit-learn</p>
+                    </div>
+                </div>
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Label Konfiqurasiyası</h4>
+                        <p style="color: var(--secondary);">0-42 indekslərinə uyğunlaşdırılmış 43 yol nişanı sinif adları ilə labels.csv yaradın</p>
+                    </div>
+                </div>
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Model Təlimi</h4>
+                        <p style="color: var(--secondary);">CNN arxitekturasını qurmaq, data artırma tətbiq etmək və 15-25 epoch üçün təlim keçirmək üçün train.py faylını icra edin</p>
+                    </div>
+                </div>
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Model Qiymətləndirməsi</h4>
+                        <p style="color: var(--secondary);">Model performansını test setində təsdiq edin, dəqiqlik və loss metrikalarını təhlil edin</p>
+                    </div>
+                </div>
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4 style="color: var(--secondary);">Deployment</h4>
+                        <p style="color: var(--secondary);">Tək şəkil təsnifatı və ya real vaxt veb-kamera əsaslı tanıma üçün predict.py faylını işə salın</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Texniki Mülahizələr -->
+        <section class="slide slide-content" data-slide="12">
+            <h2>Optimallaşdırma və Performans</h2>
+            <div class="two-column">
+                <div class="column">
+                    <h3>Performans Metrikaları</h3>
+                    <div class="feature-card">
+                        <h4>Təlim Dəqiqliyi</h4>
+                        <p>Düzgün requlyarizasiya ilə artırılmış təlim datasında 95-98%-ə yaxınlaşma gözlənilir</p>
+                    </div>
+                    <div class="feature-card" style="margin-top: 1rem;">
+                        <h4>Doğrulama Dəqiqliyi</h4>
+                        <p>Yaxşı ümumiləşdirmə qabiliyyətini göstərən ayrılmış doğrulama setində 93-96% hədəf</p>
+                    </div>
+                    <div class="feature-card" style="margin-top: 1rem;">
+                        <h4>İnference Sürəti</h4>
+                        <p>Veb-kamera tətbiqləri üçün standart CPU-da 30+ FPS ilə real vaxt proqnoz qabiliyyəti</p>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Optimallaşdırma Texnikaları</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li><strong>Data Artırma:</strong> Effektiv dataset ölçüsünü 5-10 dəfə artırır</li>
+                                    <li><strong>Dropout Requlyarizasiyası:</strong> Təsadüfi neyron deaktivasiyası vasitəsilə overfitting-i azaldır</li>
+                                    <li><strong>Batch Normalization:</strong> Təlimi sabitləşdirir və yaxınlaşmanı sürətləndirir</li>
+                                    <li><strong>Adam Optimizer:</strong> Effektiv qradiyent enişi üçün adaptiv öyrənmə sürətləri</li>
+                                    <li><strong>Early Stopping:</strong> Həddindən artıq təlimin qarşısını almaq üçün validation loss-u izləyir</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Hiperparametr Tənzimləməsi</span>
+                                <span class="icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Öyrənmə sürətinin tənzimlənməsi</li>
+                                    <li>Batch size optimallaşdırması</li>
+                                    <li>Şəbəkə dərinliyi eksperimentləri</li>
+                                    <li>Filter ölçüsü variasiyaları</li>
+                                </ul>
+                                <p style="margin-top: 1rem;">Bu parametrləri dəyişdirmək modelin performansını əhəmiyyətli dərəcədə təsir edə bilər və müxtəlif kombinasiyaları test etmək ən yaxşı nəticələr üçün vacibdir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Çətinliklər və Həllər -->
+        <section class="slide slide-content" data-slide="13">
+            <h2>Çətinliklər və Həll Yolları</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Sinif Balanssızlığı</h4>
+                    <p><strong>Çətinlik:</strong> 43 sinif arasında nümunələrin qeyri-bərabər paylanması</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Təlimi balanslaşdırmaq üçün data artırma və sinif çəkiləndirməsi</p>
+                </div>
+                <div class="feature-card">
+                    <h4>İşıqlandırma Dəyişiklikləri</h4>
+                    <p><strong>Çətinlik:</strong> Müxtəlif işıqlandırma şəraitində çəkilmiş nişanlar</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Parlaqlıq tənzimləməsi ilə normallaşdırma və artırma</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Örtülmə və Zədələnmə</h4>
+                    <p><strong>Çətinlik:</strong> Qismən örtülmüş və ya zədələnmiş yol nişanları</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Çoxsaylı konvolyusiya layer-ləri vasitəsilə möhkəm xüsusiyyət çıxarma</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Baxış Bucaqları</h4>
+                    <p><strong>Çətinlik:</strong> Müxtəlif perspektivlərdən görünən nişanlar</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Fırlanma və shear transformasiyaları daxil olmaqla geometrik artırma</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Real Vaxt Emalı</h4>
+                    <p><strong>Çətinlik:</strong> Avtomobil tətbiqləri üçün sürətli inference tələb olunur</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Effektiv konvolyusiya əməliyyatları ilə optimallaşdırılmış model arxitekturası</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Ümumiləşdirmə</h4>
+                    <p><strong>Çətinlik:</strong> Görünməmiş nişan variasiyalarında performans</p>
+                    <p style="margin-top: 0.5rem;"><strong>Həll:</strong> Hərtərəfli artırma strategiyası və dropout requlyarizasiyası</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Gələcək İnkişaf -->
+        <section class="slide slide-dark" data-slide="14">
+            <h2>Gələcək İnkişaf İstiqamətləri</h2>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Model Təkmilləşdirmələri</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>Transfer Learning:</strong> ResNet və ya EfficientNet kimi əvvəlcədən təlim keçmiş modellərdən istifadə</li>
+                            <li><strong>Ensemble Metodlar:</strong> Daha yaxşı dəqiqlik üçün çoxsaylı modelləri birləşdirmək</li>
+                            <li><strong>Attention Mexanizmləri:</strong> Yol nişanları daxilində müvafiq bölgələrə fokuslanmaq</li>
+                            <li><strong>Model Sıxılması:</strong> Mobil deployment üçün kvantlaşdırma və budama</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Dataset Genişləndirilməsi</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Çox ölkəli yol nişanı datasetləri</li>
+                            <li>Sintetik data generasiyası</li>
+                            <li>Pis hava şəraiti nümunələri</li>
+                            <li>Gecə və zəif işıqlandırma ssenariləri</li>
+                        </ul>
+                        <p style="margin-top: 1rem;">Daha müxtəlif data modelə müxtəlif real dünya şəraitlərinə uyğunlaşma qabiliyyəti verəcək.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Tətbiq Genişlənmələri</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>Mobil İnteqrasiya:</strong> iOS/Android platformalarında deployment</li>
+                            <li><strong>Edge Computing:</strong> Raspberry Pi və embedded sistemlər</li>
+                            <li><strong>Çox Nişan Aşkarlanması:</strong> Tək kadrdə çoxsaylı nişanları tanımaq</li>
+                            <li><strong>Temporal Analiz:</strong> Kontekst üçün nişan ardıcıllıqlarını izləmək</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Sistem İnteqrasiyası</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>ADAS (Qabaqcıl Sürücü Yardım Sistemləri)</li>
+                            <li>Avtonom nəqliyyat vasitələri naviqasiya pipeline-ları</li>
+                            <li>Trafik monitorinqi infrastrukturu</li>
+                            <li>Sürücü təlimi və təhsil alətləri</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Nəticə -->
+        <section class="slide slide-title" data-slide="15">
+            <h1>Nəticə</h1>
+            <div style="max-width: 900px; margin: 0 auto; text-align: left;">
+                <h3 style="font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 2rem; color: var(--secondary);">Əsas Nəticələr</h3>
+                <ul style="font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 2; list-style: none; padding: 0;">
+                    <li style="margin: 1.5rem 0; padding-left: 2rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--accent);">▸</span>
+                        43 sinifli yol nişanı tanıma üçün möhkəm CNN arxitekturası hazırlandı
+                    </li>
+                    <li style="margin: 1.5rem 0; padding-left: 2rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--accent);">▸</span>
+                        Data artırma və requlyarizasiya texnikaları vasitəsilə yüksək dəqiqlik əldə edildi
+                    </li>
+                    <li style="margin: 1.5rem 0; padding-left: 2rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--accent);">▸</span>
+                        Veb-kamera inteqrasiyası ilə real vaxt tanıma sistemi həyata keçirildi
+                    </li>
+                    <li style="margin: 1.5rem 0; padding-left: 2rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--accent);">▸</span>
+                        Qabaqcıl sürücü yardım tətbiqləri üçün əsas yaradıldı
+                    </li>
+                </ul>
+                <div style="margin-top: 4rem; padding: 2rem; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 4px solid var(--accent);">
+                    <p style="font-size: clamp(1rem, 2.5vw, 1.3rem); line-height: 1.8; margin: 0;">
+                        Bu layihə dərin öyrənmənin kompüter görmədə praktik tətbiqini nümayiş etdirir və 
+                        yol təhlükəsizliyi və avtonom sürücülük sistemləri üçün əhəmiyyətli təsirləri olan 
+                        avtomatlaşdırılmış yol nişanı tanıma üçün genişlənən həll təklif edir.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Naviqasiya Nəzarət -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn"><span>Əvvəlki</span></button>
+        <button class="nav-btn" id="nextBtn"><span>Növbəti</span></button>
+    </div>
+
+    <script>
+        // Təqdimat Naviqasiyası
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        
+        // Slayd sayğacını yeniləmək
+        document.getElementById('totalSlides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+            
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            slides[currentSlide - 1].classList.add('active');
+            slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+            
+            document.getElementById('currentSlide').textContent = currentSlide;
+            
+            // Düymə vəziyyətlərini yeniləmək
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+        
+        function prevSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+        
+        // Event Listener-lər
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        
+        // Klaviatura Naviqasiyası
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+        
+        // Accordion Funksionallığı
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const isActive = content.classList.contains('active');
+                
+                // Cari accordion-u toggle et
+                if (!isActive) {
+                    content.classList.add('active');
+                    this.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                    this.classList.remove('active');
+                }
+            });
+        });
+        
+        // İnisializasiya
+        showSlide(currentSlide);
+        
+        // Yükləmədə yuxarıya scroll et
+        window.scrollTo(0, 0);
+    </script>
+</body>
+</html>
