@@ -927,6 +927,29 @@
             height: auto;
         }
         
+        /* Image placeholder for demo screenshots */
+        .image-placeholder {
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+            border: 2px dashed #999;
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 640px) {
+            .image-placeholder {
+                padding: 1.5rem 1rem;
+                min-height: 150px !important;
+            }
+        }
+        
         /* Mobile-specific improvements */
         @media (max-width: 640px) {
             .accordion-header {
@@ -1611,8 +1634,117 @@ def predict_sign(image_path=None, use_webcam=False):
             </div>
         </section>
 
-        <!-- Slide 11: İmplementasiya Addımları -->
-        <section class="slide slide-dark" data-slide="11">
+        <!-- Slide 11: Live Demo Output -->
+        <section class="slide slide-content" data-slide="11">
+            <h2>Canlı Demo Çıxışı və Performans</h2>
+            
+            <div class="two-column">
+                <div class="column">
+                    <h3>🎥 Webcam Rejimi Çıxışı</h3>
+                    <div class="image-placeholder" style="min-height: 200px; margin: 1rem 0;">
+                        [OpenCV Pəncərəsi: "Traffic Sign Recognition"<br>
+                        Canlı video + yaşıl mətn overlay:<br>
+                        "Speed limit 50 (94.7%)"]
+                    </div>
+                    <ul>
+                        <li><strong>Real-time vizualizasiya:</strong> Veb-kamera görüntüsü ilə birlikdə canlı proqnoz</li>
+                        <li><strong>Dinamik yenilənmə:</strong> Hər kadr üçün yeni proqnoz (≈30 FPS)</li>
+                        <li><strong>Əminlik göstəricisi:</strong> Faizlə ifadə edilən model əminliyi</li>
+                        <li><strong>İnteraktiv:</strong> Kameranı hərəkət etdirərək müxtəlif nişanları test edin</li>
+                    </ul>
+                </div>
+                
+                <div class="column">
+                    <h3>📊 Tək Şəkil Rejimi Çıxışı</h3>
+                    <div class="code-block" style="margin: 1rem 0;">
+<span class="comment"># Console output</span>
+1/1 [==============================] - 0s 45ms/step
+Predicted: <span class="string">Stop (97.8%)</span>
+
+<span class="comment"># İstifadə nümunəsi</span>
+python predict.py --image examples/stop_sign.jpg
+                    </div>
+                    <ul>
+                        <li><strong>Sürətli analiz:</strong> Tək şəkil üçün ~45ms inference vaxtı</li>
+                        <li><strong>Konsol çıxışı:</strong> Sadə və aydın proqnoz nəticəsi</li>
+                        <li><strong>Test məqsədli:</strong> Ayrı-ayrı nişanları yoxlamaq üçün ideal</li>
+                        <li><strong>Batch emalı:</strong> Çoxsaylı şəkilləri ardıcıl test etmək mümkün</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Nümunə Proqnozlar və Dəqiqlik</h3>
+            <div class="responsive-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Giriş Şəkli</th>
+                            <th>Proqnozlaşdırılan Sinif</th>
+                            <th>Əminlik</th>
+                            <th>Qeydlər</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Aydın "Dayanma" nişanı</td>
+                            <td>Stop</td>
+                            <td>96-99%</td>
+                            <td>Çox etibarlı, frontal görünüş</td>
+                        </tr>
+                        <tr>
+                            <td>Sürət məhdudiyyəti 50 (yaxşı bucaq)</td>
+                            <td>Speed limit 50</td>
+                            <td>90-97%</td>
+                            <td>Tipik yaxşı nəticə</td>
+                        </tr>
+                        <tr>
+                            <td>Yol vermə nişanı (yan bucaqdan)</td>
+                            <td>Yield</td>
+                            <td>75-92%</td>
+                            <td>Bucaq dəqiqliyi azaldır</td>
+                        </tr>
+                        <tr>
+                            <td>Kiçik uzaq nişan</td>
+                            <td>Müxtəlif/Aşağı əminlik</td>
+                            <td>&lt;60%</td>
+                            <td>Yanaşmanın məhdudiyyəti</td>
+                        </tr>
+                        <tr>
+                            <td>Pis işıqlandırma/kölgə</td>
+                            <td>Dəyişkən</td>
+                            <td>50-85%</td>
+                            <td>İşıqlandırmadan asılıdır</td>
+                        </tr>
+                        <tr>
+                            <td>Qismən örtülmüş nişan</td>
+                            <td>Dəyişkən</td>
+                            <td>40-80%</td>
+                            <td>Kontekstdən asılıdır</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="feature-grid" style="margin-top: 2rem;">
+                <div class="feature-card">
+                    <h4>🎯 Optimal Şərait</h4>
+                    <p><strong>Əminlik: 85-98%</strong><br>
+                    Nişan kadrın çox hissəsini doldurur, yaxşı işıqlandırma, frontal görünüş</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚠️ Çətin Şərait</h4>
+                    <p><strong>Əminlik: 50-80%</strong><br>
+                    Nişan kiçik, fırlanmış, kölgədə, qismən örtülmüş və ya uzaq məsafədə</p>
+                </div>
+                <div class="feature-card">
+                    <h4>💡 Praktik Tövsiyələr</h4>
+                    <p>Demo üçün nişanları kamera qarşısında tutun, aydın işıqlandırma təmin edin, nişanı mərkəzdə saxlayın</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: İmplementasiya Addımları -->
+        <section class="slide slide-dark" data-slide="12">
             <h2>İmplementasiya İş Axını</h2>
             <div class="process-steps">
                 <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
@@ -1660,8 +1792,8 @@ def predict_sign(image_path=None, use_webcam=False):
             </div>
         </section>
 
-        <!-- Slide 12: Texniki Mülahizələr -->
-        <section class="slide slide-content" data-slide="12">
+        <!-- Slide 13: Texniki Mülahizələr -->
+        <section class="slide slide-content" data-slide="13">
             <h2>Optimallaşdırma və Performans</h2>
             <div class="two-column">
                 <div class="column">
@@ -1717,8 +1849,8 @@ def predict_sign(image_path=None, use_webcam=False):
             </div>
         </section>
 
-        <!-- Slide 13: Çətinliklər və Həllər -->
-        <section class="slide slide-content" data-slide="13">
+        <!-- Slide 14: Çətinliklər və Həllər -->
+        <section class="slide slide-content" data-slide="14">
             <h2>Çətinliklər və Həll Yolları</h2>
             <div class="feature-grid">
                 <div class="feature-card">
@@ -1754,8 +1886,8 @@ def predict_sign(image_path=None, use_webcam=False):
             </div>
         </section>
 
-        <!-- Slide 14: Gələcək İnkişaf -->
-        <section class="slide slide-dark" data-slide="14">
+        <!-- Slide 15: Gələcək İnkişaf -->
+        <section class="slide slide-dark" data-slide="15">
             <h2>Gələcək İnkişaf İstiqamətləri</h2>
             <div class="accordion">
                 <div class="accordion-item">
@@ -1821,8 +1953,8 @@ def predict_sign(image_path=None, use_webcam=False):
             </div>
         </section>
 
-        <!-- Slide 15: Nəticə -->
-        <section class="slide slide-title" data-slide="15">
+        <!-- Slide 16: Nəticə -->
+        <section class="slide slide-title" data-slide="16">
             <h1>Nəticə</h1>
             <div style="max-width: 900px; margin: 0 auto; text-align: left;">
                 <h3 style="font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 2rem; color: var(--secondary);">Əsas Nəticələr</h3>
@@ -1857,7 +1989,7 @@ def predict_sign(image_path=None, use_webcam=False):
 
     <!-- Naviqasiya Nəzarət -->
     <div class="slide-counter">
-        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+        <span id="currentSlide">1</span> / <span id="totalSlides">16</span>
     </div>
     <div class="navigation">
         <button class="nav-btn" id="prevBtn"><span>Əvvəlki</span></button>
